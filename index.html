@@ -432,7 +432,7 @@ document.getElementById("btnGoleste").addEventListener("click", () => {
   mergiLa(0, 0);
 });
 
-/* Cuvintele de 3 litere se dau ca ajutor, sub careu (convenție de rebus) */
+/* „Cuvinte rare”: cuvintele de 3 litere, date ca ajutor sub careu (convenție de rebus) */
 (function cuvinteDeTrei() {
   const gasite = new Set();
   for (let r = 0; r < N; r++) CAREU[r].split("#").forEach(w => w.length === 3 && gasite.add(w));
@@ -440,7 +440,7 @@ document.getElementById("btnGoleste").addEventListener("click", () => {
     CAREU.map(rand => rand[c]).join("").split("#").forEach(w => w.length === 3 && gasite.add(w));
   if (gasite.size)
     document.getElementById("ajutor").innerHTML =
-      `<b>Cuvinte de 3 litere</b><span>${[...gasite].sort().join(", ")}</span>`;
+      `<b>Cuvinte rare</b><span>${[...gasite].sort().join(", ")}</span>`;
 })();
 
 /* Butonul de soluție apare abia la 24 de ore după publicare */
