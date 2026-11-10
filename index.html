@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Careul de încălzire</title>
+<title>Careu: Mineritul</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
@@ -58,16 +58,18 @@ header h1 {
 header p { margin: 4px 0 0; color: var(--estompat); max-width: 60ch; }
 
 .continut { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: start; }
-@media (max-width: 640px) { .continut { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 820px) { .continut { grid-template-columns: minmax(0, 1fr); } }
+.pagina { max-width: 1000px; }
+.definitii li .sep { color: var(--estompat); margin: 0 4px; }
 
 /* --- Careul --- */
 .careu-zona { display: grid; gap: 14px; justify-items: start; }
 .careu {
   --n: 5;
-  --latura: clamp(48px, 13vw, 64px);
+  --latura: clamp(28px, calc((100vw - 64px) / 10.6), 44px);
   display: grid;
-  grid-template-columns: 28px repeat(var(--n), var(--latura));
-  grid-template-rows: 26px repeat(var(--n), var(--latura));
+  grid-template-columns: 24px repeat(var(--n), var(--latura));
+  grid-template-rows: 24px repeat(var(--n), var(--latura));
 }
 .eticheta {
   font-family: var(--f-cifre); font-size: .8rem; color: var(--estompat);
@@ -124,8 +126,8 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
 
 <div class="pagina">
   <header>
-    <h1>Careul de încălzire</h1>
-    <p>Scrie direct în căsuțe. Click pe aceeași căsuță schimbă direcția, iar săgețile te mută prin careu. Diacriticele nu contează, ca la orice rebus.</p>
+    <h1>Mineritul</h1>
+    <p>Careu tematic 10×10, pentru cei din Țara Zarandului și nu numai. Scrie direct în căsuțe. Click pe aceeași căsuță schimbă direcția, iar săgețile te mută prin careu. Diacriticele nu contează, ca la orice rebus.</p>
   </header>
 
   <div class="continut">
@@ -149,7 +151,7 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
         <h2>Vertical</h2>
         <ol id="listaVertical"></ol>
       </div>
-      <p class="nota">Rândurile 2 și 4 se completează singure din verticale.</p>
+      <p class="nota">Pe fiecare rând, definițiile sunt în ordine, de la stânga la dreapta (sus în jos la verticale), separate prin liniuță.</p>
     </section>
   </div>
 </div>
@@ -161,24 +163,45 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
    Pentru un careu nou schimbi doar partea asta.
    ============================================================ */
 const CAREU = [
-  "COASA",
-  "O#R#L",
-  "PIATA",
-  "A#M#M",
-  "CLAPA",
+  "MINERIT#MS",
+  "DNA#ONORAT",
+  "ACIZI#BAIE",
+  "#ABA#CAI#A",
+  "ORACOL#DAM",
+  "RC#AVIZ#PP",
+  "BASM#NISA#",
+  "I#PARI#ASA",
+  "TARNACOP#U",
+  "AVETI#TAUR",
 ];
 
-/* Definițiile, după numărul rândului (orizontal) sau al coloanei (vertical). */
+/* Definițiile, pe rânduri (orizontal) și coloane (vertical).
+   Fiecare rând are o listă: câte o definiție pentru fiecare cuvânt
+   de minimum 2 litere, în ordine de la stânga la dreapta / de sus în jos. */
 const DEFINITII = {
   orizontal: {
-    1: "Tunde câmpul fără foarfecă.",
-    3: "Aici prețul se ia la bani mărunți, mai ales sâmbăta.",
-    5: "Cheie care nu deschide nicio ușă, dar scoate note.",
+    1: ["Meserie care se face cu capul în pământ.", "Manuscris (abr.)."],
+    2: ["Procurori care nu iartă (abr.).", "Cinstit cu un titlu."],
+    3: ["Substanțe care ard fără foc.", "Mină, pe limba moților."],
+    4: ["Postav gros pentru sumane.", "Putere ascunsă sub capotă."],
+    5: ["Prezicătorul de la Delfi.", "Oferim cu toții."],
+    6: ["Arc fără început!", "Aprobare cu ștampilă.", "Pop fără vocală!"],
+    7: ["Poveste cu Făt-Frumos.", "Scobitură în perete, pentru o statuetă."],
+    8: ["Stâlpi de gard.", "Doar ... și nu altfel!"],
+    9: ["Unealta ortacului, cu două ciocuri."],
+    10: ["Posedați.", "Zodie cu coarne."],
   },
   vertical: {
-    1: "Are rădăcini, dar nu merge la dentist.",
-    3: "Cuprul, pe românește.",
-    5: "Cuprul cu zinc, strălucind pe clanțe.",
+    1: ["Da, dar cu îndoială.", "Drumul Lunii în jurul Pământului."],
+    2: ["Umple vagonetul.", "Avocat (abr.)."],
+    3: ["Dracul, spus mai politicos.", "Către."],
+    4: ["Comoara din adâncuri, pe harta geologului."],
+    5: ["Familie de albine plecată de acasă.", "Început de ovăz!", "Grădina lui Adam."],
+    6: ["Plantă din care se țese pânza.", "Ochi de medic."],
+    7: ["Bate ritmul în fanfara minerilor.", "Opusul nopții.", "Coada robotului!"],
+    8: ["Incursiune rapidă.", "Cu ea se începe și grădina, și galeria."],
+    9: ["Luna florilor.", "Țin degetul pe buton."],
+    10: ["Moara de zdrobit minereul aurifer, în Apuseni.", "Comoara Bradului, expusă la muzeu."],
   },
 };
 
@@ -252,6 +275,26 @@ function numarCuvant(r, c, dir) {
   return dir === "orizontal" ? s[0][0] + 1 : s[0][1] + 1;
 }
 
+// Toate cuvintele (de minimum 2 litere) de pe un rând sau o coloană, ca liste de căsuțe
+function cuvinteleLiniei(nr, dir) {
+  const rez = [];
+  for (let k = 0; k < N; k++) {
+    const [r, c] = dir === "orizontal" ? [nr - 1, k] : [k, nr - 1];
+    if (!celule[r][c]) continue;
+    const s = segment(r, c, dir);
+    if (s.length >= 2 && s[0][0] === r && s[0][1] === c) rez.push(s);
+  }
+  return rez;
+}
+
+// Al câtelea cuvânt de pe linie e cel care conține căsuța (r, c)
+function indexCuvant(r, c, dir) {
+  const nr = numarCuvant(r, c, dir);
+  if (!nr) return -1;
+  const start = segment(r, c, dir)[0];
+  return cuvinteleLiniei(nr, dir).findIndex(s => s[0][0] === start[0] && s[0][1] === start[1]);
+}
+
 function evidentiaza() {
   celule.flat().forEach(x => x && x.classList.remove("activa", "in-cuvant"));
   let s = segment(activ.r, activ.c, directie);
@@ -265,7 +308,8 @@ function evidentiaza() {
   const nr = numarCuvant(activ.r, activ.c, directie);
   document.querySelectorAll(".definitii li").forEach(li =>
     li.classList.toggle("selectata", li.dataset.dir === directie && +li.dataset.nr === nr));
-  const def = nr ? DEFINITII[directie][nr] : null;
+  const idx = indexCuvant(activ.r, activ.c, directie);
+  const def = nr && idx >= 0 ? (DEFINITII[directie][nr] || [])[idx] : null;
   document.getElementById("defCurenta").innerHTML = def
     ? `<b>${directie === "orizontal" ? "Orizontal" : "Vertical"} ${nr}.</b> ${def}`
     : "";
@@ -332,15 +376,14 @@ celule.flat().filter(Boolean).forEach(inp => {
    ============================================================ */
 for (const dir of ["orizontal", "vertical"]) {
   const ol = document.getElementById(dir === "orizontal" ? "listaOrizontal" : "listaVertical");
-  Object.entries(DEFINITII[dir]).forEach(([nr, text]) => {
+  Object.entries(DEFINITII[dir]).forEach(([nr, lista]) => {
     const li = document.createElement("li");
     li.dataset.dir = dir; li.dataset.nr = nr;
-    li.innerHTML = `<b>${nr}.</b>${text}`;
+    li.innerHTML = `<b>${nr}.</b>` + lista.join('<span class="sep">–</span>');
     li.addEventListener("click", () => {
       directie = dir;
-      const [r, c] = dir === "orizontal" ? [nr - 1, 0] : [0, nr - 1];
-      const start = segment(r, c, dir).length ? [r, c] : null;
-      if (start) mergiLa(...start);
+      const primul = cuvinteleLiniei(+nr, dir)[0];
+      if (primul) mergiLa(...primul[0]);
     });
     ol.appendChild(li);
   });

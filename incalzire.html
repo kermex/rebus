@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Careul de încălzire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: careul în stânga ca pagina de revistă, definițiile în dreapta; pe telefon, una sub alta. */
+:root {
+  --hartie: #eef1f3;      /* fundalul paginii */
+  --cerneala: #18222c;    /* text și pătrate negre */
+  --casuta: #ffffff;      /* căsuțele albe */
+  --linie: #9aa6b0;       /* liniile grilei */
+  --marker: #ffe27a;      /* căsuța activă, ca un marker galben */
+  --cuvant: #dfe9f2;      /* restul cuvântului selectat */
+  --bine: #2f7d4f;
+  --gresit: #b23a3a;
+  --estompat: #5b6772;
+
+  --f-litere: "Barlow Condensed", "Arial Narrow", sans-serif-condensed, sans-serif;
+  --f-text: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-cifre: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --hartie: #141a20; --cerneala: #e6ebef; --casuta: #1f272f; --linie: #4a5662;
+    --marker: #8a6d12; --cuvant: #263646; --bine: #5fc58a; --gresit: #ef7a7a; --estompat: #97a3ad;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --hartie: #141a20; --cerneala: #e6ebef; --casuta: #1f272f; --linie: #4a5662;
+  --marker: #8a6d12; --cuvant: #263646; --bine: #5fc58a; --gresit: #ef7a7a; --estompat: #97a3ad;
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body {
+  margin: 0;
+  background: var(--hartie);
+  color: var(--cerneala);
+  font-family: var(--f-text);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 40px;
+}
+.pagina { max-width: 860px; margin: 0 auto; display: grid; gap: 24px; }
+
+header h1 {
+  font-family: var(--f-litere); font-weight: 700; font-size: 2.2rem;
+  letter-spacing: .02em; text-transform: uppercase; margin: 0; line-height: 1.1;
+}
+header p { margin: 4px 0 0; color: var(--estompat); max-width: 60ch; }
+
+.continut { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 640px) { .continut { grid-template-columns: minmax(0, 1fr); } }
+
+/* --- Careul --- */
+.careu-zona { display: grid; gap: 14px; justify-items: start; }
+.careu {
+  --n: 5;
+  --latura: clamp(48px, 13vw, 64px);
+  display: grid;
+  grid-template-columns: 28px repeat(var(--n), var(--latura));
+  grid-template-rows: 26px repeat(var(--n), var(--latura));
+}
+.eticheta {
+  font-family: var(--f-cifre); font-size: .8rem; color: var(--estompat);
+  display: grid; place-items: center;
+}
+.casuta, .negru { border: 1px solid var(--linie); margin: 0 -1px -1px 0; }
+.negru { background: var(--cerneala); border-color: var(--cerneala); }
+.casuta {
+  background: var(--casuta); color: var(--cerneala);
+  font-family: var(--f-litere); font-weight: 600; font-size: calc(var(--latura) * .62);
+  text-align: center; text-transform: uppercase; caret-color: transparent;
+  width: 100%; height: 100%; padding: 0; border-radius: 0; outline: none;
+}
+.casuta.in-cuvant { background: var(--cuvant); }
+.casuta.activa { background: var(--marker); }
+.casuta.bine { color: var(--bine); }
+.casuta.gresit { color: var(--gresit); }
+.casuta:focus-visible { box-shadow: inset 0 0 0 2px var(--cerneala); }
+
+.definitie-curenta {
+  font-size: .95rem; min-height: 3em; max-width: 34ch;
+  border-left: 3px solid var(--marker); padding-left: 10px;
+}
+.definitie-curenta b { font-family: var(--f-cifre); font-weight: 500; font-size: .85rem; }
+
+.butoane { display: flex; flex-wrap: wrap; gap: 8px; }
+button {
+  font-family: var(--f-text); font-size: .95rem; font-weight: 600;
+  background: transparent; color: var(--cerneala);
+  border: 1.5px solid var(--cerneala); border-radius: 6px; padding: 7px 14px; cursor: pointer;
+}
+button.principal { background: var(--cerneala); color: var(--hartie); }
+button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
+.stare { font-size: .9rem; color: var(--estompat); min-height: 1.5em; margin: 0; }
+
+/* --- Definițiile --- */
+.definitii { display: grid; gap: 20px; min-width: 0; }
+.definitii h2 {
+  font-family: var(--f-litere); font-weight: 700; font-size: 1.15rem;
+  text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px;
+}
+.definitii ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.definitii li { cursor: pointer; padding: 3px 6px; margin: 0 -6px; border-radius: 4px; }
+.definitii li b { font-family: var(--f-cifre); font-weight: 500; font-size: .85rem; margin-right: 6px; }
+.definitii li.selectata { background: var(--cuvant); }
+.nota { font-size: .85rem; color: var(--estompat); margin: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .casuta { transition: background-color .12s; }
+}
+</style>
+</head>
+<body>
+
+<div class="pagina">
+  <header>
+    <h1>Careul de încălzire</h1>
+    <p>Scrie direct în căsuțe. Click pe aceeași căsuță schimbă direcția, iar săgețile te mută prin careu. Diacriticele nu contează, ca la orice rebus.</p>
+  </header>
+
+  <div class="continut">
+    <section class="careu-zona" aria-label="Careu">
+      <div class="careu" id="careu"></div>
+      <div class="definitie-curenta" id="defCurenta" aria-live="polite"></div>
+      <div class="butoane">
+        <button class="principal" id="btnVerifica" type="button">Verifică</button>
+        <button id="btnSolutie" type="button">Arată soluția</button>
+        <button id="btnGoleste" type="button">Golește</button>
+      </div>
+      <p class="stare" id="stare" aria-live="polite"></p>
+    </section>
+
+    <section class="definitii">
+      <div>
+        <h2>Orizontal</h2>
+        <ol id="listaOrizontal"></ol>
+      </div>
+      <div>
+        <h2>Vertical</h2>
+        <ol id="listaVertical"></ol>
+      </div>
+      <p class="nota">Rândurile 2 și 4 se completează singure din verticale.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. DATELE CAREULUI
+   Fiecare rând e un șir de litere; "#" înseamnă pătrat negru.
+   Pentru un careu nou schimbi doar partea asta.
+   ============================================================ */
+const CAREU = [
+  "COASA",
+  "O#R#L",
+  "PIATA",
+  "A#M#M",
+  "CLAPA",
+];
+
+/* Definițiile, după numărul rândului (orizontal) sau al coloanei (vertical). */
+const DEFINITII = {
+  orizontal: {
+    1: "Tunde câmpul fără foarfecă.",
+    3: "Aici prețul se ia la bani mărunți, mai ales sâmbăta.",
+    5: "Cheie care nu deschide nicio ușă, dar scoate note.",
+  },
+  vertical: {
+    1: "Are rădăcini, dar nu merge la dentist.",
+    3: "Cuprul, pe românește.",
+    5: "Cuprul cu zinc, strălucind pe clanțe.",
+  },
+};
+
+/* ============================================================
+   2. DESENAREA GRILEI
+   ============================================================ */
+const N = CAREU.length;
+const grila = document.getElementById("careu");
+grila.style.setProperty("--n", N);
+const celule = []; // celule[r][c] = <input> sau null pentru pătrat negru
+
+grila.appendChild(document.createElement("span")); // colțul gol din stânga sus
+for (let c = 0; c < N; c++) {
+  const e = document.createElement("span");
+  e.className = "eticheta"; e.textContent = c + 1;
+  grila.appendChild(e);
+}
+for (let r = 0; r < N; r++) {
+  const e = document.createElement("span");
+  e.className = "eticheta"; e.textContent = r + 1;
+  grila.appendChild(e);
+  celule.push([]);
+  for (let c = 0; c < N; c++) {
+    if (CAREU[r][c] === "#") {
+      const negru = document.createElement("div");
+      negru.className = "negru";
+      grila.appendChild(negru);
+      celule[r].push(null);
+    } else {
+      const inp = document.createElement("input");
+      inp.className = "casuta";
+      inp.id = `c-${r}-${c}`;
+      inp.maxLength = 1;
+      inp.autocomplete = "off";
+      inp.setAttribute("autocapitalize", "characters");
+      inp.setAttribute("aria-label", `Rândul ${r + 1}, coloana ${c + 1}`);
+      inp.dataset.r = r; inp.dataset.c = c;
+      grila.appendChild(inp);
+      celule[r].push(inp);
+    }
+  }
+}
+
+/* ============================================================
+   3. NAVIGAREA: căsuța activă și direcția de scris
+   ============================================================ */
+let activ = { r: 0, c: 0 };
+let directie = "orizontal";
+
+// Cuvântul (segmentul fără pătrate negre) care trece prin căsuța (r, c)
+function segment(r, c, dir) {
+  const pas = dir === "orizontal" ? [0, 1] : [1, 0];
+  let [r0, c0] = [r, c];
+  while (true) {
+    const [pr, pc] = [r0 - pas[0], c0 - pas[1]];
+    if (pr < 0 || pc < 0 || !celule[pr][pc]) break;
+    [r0, c0] = [pr, pc];
+  }
+  const lista = [];
+  let [rr, cc] = [r0, c0];
+  while (rr < N && cc < N && celule[rr][cc]) {
+    lista.push([rr, cc]);
+    rr += pas[0]; cc += pas[1];
+  }
+  return lista;
+}
+
+function numarCuvant(r, c, dir) {
+  const s = segment(r, c, dir);
+  if (s.length < 2) return null;
+  return dir === "orizontal" ? s[0][0] + 1 : s[0][1] + 1;
+}
+
+function evidentiaza() {
+  celule.flat().forEach(x => x && x.classList.remove("activa", "in-cuvant"));
+  let s = segment(activ.r, activ.c, directie);
+  if (s.length < 2) { // o literă singură: încercăm cealaltă direcție
+    const alta = directie === "orizontal" ? "vertical" : "orizontal";
+    if (segment(activ.r, activ.c, alta).length >= 2) { directie = alta; s = segment(activ.r, activ.c, directie); }
+  }
+  s.forEach(([r, c]) => celule[r][c].classList.add("in-cuvant"));
+  celule[activ.r][activ.c].classList.add("activa");
+
+  const nr = numarCuvant(activ.r, activ.c, directie);
+  document.querySelectorAll(".definitii li").forEach(li =>
+    li.classList.toggle("selectata", li.dataset.dir === directie && +li.dataset.nr === nr));
+  const def = nr ? DEFINITII[directie][nr] : null;
+  document.getElementById("defCurenta").innerHTML = def
+    ? `<b>${directie === "orizontal" ? "Orizontal" : "Vertical"} ${nr}.</b> ${def}`
+    : "";
+}
+
+function mergiLa(r, c, focus = true) {
+  if (r < 0 || c < 0 || r >= N || c >= N || !celule[r][c]) return false;
+  activ = { r, c };
+  if (focus) celule[r][c].focus();
+  evidentiaza();
+  return true;
+}
+
+// Următoarea căsuță albă în direcția dată (sare peste pătratele negre)
+function pasCatre(dr, dc) {
+  let [r, c] = [activ.r + dr, activ.c + dc];
+  while (r >= 0 && c >= 0 && r < N && c < N) {
+    if (celule[r][c]) return mergiLa(r, c);
+    r += dr; c += dc;
+  }
+  return false;
+}
+
+/* ============================================================
+   4. TASTATURA
+   ============================================================ */
+celule.flat().filter(Boolean).forEach(inp => {
+  inp.addEventListener("mousedown", e => {
+    const r = +inp.dataset.r, c = +inp.dataset.c;
+    if (r === activ.r && c === activ.c && document.activeElement === inp) {
+      directie = directie === "orizontal" ? "vertical" : "orizontal";
+      e.preventDefault(); evidentiaza();
+    }
+  });
+  inp.addEventListener("focus", () => mergiLa(+inp.dataset.r, +inp.dataset.c, false));
+
+  inp.addEventListener("input", () => {
+    const litera = inp.value.slice(-1).toUpperCase();
+    inp.value = /\p{L}/u.test(litera) ? litera : "";
+    inp.classList.remove("bine", "gresit");
+    if (inp.value) directie === "orizontal" ? pasCatre(0, 1) : pasCatre(1, 0);
+  });
+
+  inp.addEventListener("keydown", e => {
+    const harta = { ArrowRight: [0, 1], ArrowLeft: [0, -1], ArrowDown: [1, 0], ArrowUp: [-1, 0] };
+    if (harta[e.key]) {
+      e.preventDefault();
+      const [dr, dc] = harta[e.key];
+      const nouaDir = dr === 0 ? "orizontal" : "vertical";
+      if (nouaDir !== directie && segment(activ.r, activ.c, nouaDir).length >= 2) {
+        directie = nouaDir; evidentiaza();
+      } else pasCatre(dr, dc);
+    } else if (e.key === "Backspace" && !inp.value) {
+      e.preventDefault();
+      if (directie === "orizontal" ? pasCatre(0, -1) : pasCatre(-1, 0)) {
+        const x = celule[activ.r][activ.c]; x.value = ""; x.classList.remove("bine", "gresit");
+      }
+    }
+  });
+});
+
+/* ============================================================
+   5. LISTA DE DEFINIȚII (click pe o definiție = sari la cuvânt)
+   ============================================================ */
+for (const dir of ["orizontal", "vertical"]) {
+  const ol = document.getElementById(dir === "orizontal" ? "listaOrizontal" : "listaVertical");
+  Object.entries(DEFINITII[dir]).forEach(([nr, text]) => {
+    const li = document.createElement("li");
+    li.dataset.dir = dir; li.dataset.nr = nr;
+    li.innerHTML = `<b>${nr}.</b>${text}`;
+    li.addEventListener("click", () => {
+      directie = dir;
+      const [r, c] = dir === "orizontal" ? [nr - 1, 0] : [0, nr - 1];
+      const start = segment(r, c, dir).length ? [r, c] : null;
+      if (start) mergiLa(...start);
+    });
+    ol.appendChild(li);
+  });
+}
+
+/* ============================================================
+   6. VERIFICARE, SOLUȚIE, GOLIRE
+   Diacriticele se ignoră: Ă = Â = A, Î = I, Ș = S, Ț = T.
+   ============================================================ */
+const faraDiacritice = s =>
+  s.normalize("NFD").replace(/\p{M}/gu, "").replace(/[ŞȘ]/g, "S").replace(/[ŢȚ]/g, "T").toUpperCase();
+const stare = document.getElementById("stare");
+
+document.getElementById("btnVerifica").addEventListener("click", () => {
+  let bune = 0, total = 0, goale = 0;
+  celule.forEach((rand, r) => rand.forEach((x, c) => {
+    if (!x) return;
+    total++;
+    x.classList.remove("bine", "gresit");
+    if (!x.value) { goale++; return; }
+    const ok = faraDiacritice(x.value) === CAREU[r][c];
+    x.classList.add(ok ? "bine" : "gresit");
+    if (ok) bune++;
+  }));
+  stare.textContent = bune === total
+    ? "Dezlegat complet. Bravo!"
+    : `${bune} litere bune din ${total}` + (goale ? `, ${goale} căsuțe goale.` : ". Cele roșii sunt greșite.");
+});
+
+document.getElementById("btnSolutie").addEventListener("click", () => {
+  celule.forEach((rand, r) => rand.forEach((x, c) => {
+    if (x) { x.value = CAREU[r][c]; x.classList.remove("bine", "gresit"); }
+  }));
+  stare.textContent = "Soluția e afișată.";
+});
+
+document.getElementById("btnGoleste").addEventListener("click", () => {
+  celule.flat().forEach(x => { if (x) { x.value = ""; x.classList.remove("bine", "gresit"); } });
+  stare.textContent = "";
+  mergiLa(0, 0);
+});
+
+/* Pornire: prima căsuță selectată, fără focus (ca să nu apară tastatura pe telefon) */
+mergiLa(0, 0, false);
+</script>
+</body>
+</html>
