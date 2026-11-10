@@ -136,7 +136,7 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
       <div class="definitie-curenta" id="defCurenta" aria-live="polite"></div>
       <div class="butoane">
         <button class="principal" id="btnVerifica" type="button">Verifică</button>
-        <button id="btnSolutie" type="button">Arată soluția</button>
+        <button id="btnSolutie" type="button" hidden>Arată soluția</button>
         <button id="btnGoleste" type="button">Golește</button>
       </div>
       <p class="stare" id="stare" aria-live="polite"></p>
@@ -162,18 +162,19 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
    Fiecare rând e un șir de litere; "#" înseamnă pătrat negru.
    Pentru un careu nou schimbi doar partea asta.
    ============================================================ */
-const CAREU = [
-  "MINERIT#MS",
-  "DNA#ONORAT",
-  "ACIZI#BAIE",
-  "#ABA#CAI#A",
-  "ORACOL#DAM",
-  "RC#AVIZ#PP",
-  "BASM#NISA#",
-  "I#PARI#ASA",
-  "TARNACOP#U",
-  "AVETI#TAUR",
-];
+/* Soluția e codată (base64, de-a-ndoaselea), ca să nu se vadă dacă cineva
+   se uită în codul paginii. Pentru un careu nou: scrii rândurile cu litere,
+   iar Claude îți generează linia codată. "#" = pătrat negru. */
+const SOLUTIE_CODATA = "UlVBVCNJVEVWQVUjUE9DQU5SQVRBU0EjSVJBUCNJI0FTSU4jTVNBQlBQI1pJVkEjQ1JNQUQjTE9DQVJPQSNJQUMjQUJBI0VJQUIjSVpJQ0FUQVJPTk8jQU5EU00jVElSRU5JTQ==";
+const LATURA = 10;
+
+/* Data și ora publicării. Butonul „Arată soluția” apare după 24 de ore. */
+const PUBLICAT = "2026-11-10T17:15:00+02:00";
+
+const CAREU = (() => {
+  const s = [...atob(SOLUTIE_CODATA)].reverse().join("");
+  return Array.from({ length: LATURA }, (_, i) => s.slice(i * LATURA, (i + 1) * LATURA));
+})();
 
 /* Definițiile, pe rânduri (orizontal) și coloane (vertical).
    Fiecare rând are o listă: câte o definiție pentru fiecare cuvânt
@@ -425,6 +426,24 @@ document.getElementById("btnGoleste").addEventListener("click", () => {
   stare.textContent = "";
   mergiLa(0, 0);
 });
+
+/* Butonul de soluție apare abia la 24 de ore după publicare */
+(function programeazaSolutia() {
+  const btn = document.getElementById("btnSolutie");
+  const momentul = new Date(PUBLICAT).getTime() + 24 * 60 * 60 * 1000;
+  const arata = () => {
+    btn.hidden = false;
+    if (stare.dataset.asteptare) { stare.textContent = ""; delete stare.dataset.asteptare; }
+  };
+  const ramas = momentul - Date.now();
+  if (ramas <= 0) return arata();
+  const cand = new Date(momentul).toLocaleString("ro-RO", {
+    weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
+  });
+  stare.textContent = `Soluția se publică ${cand}.`;
+  stare.dataset.asteptare = "1";
+  if (ramas < 2 ** 31) setTimeout(arata, ramas);
+})();
 
 /* Pornire: prima căsuță selectată, fără focus (ca să nu apară tastatura pe telefon) */
 mergiLa(0, 0, false);
