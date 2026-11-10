@@ -104,6 +104,10 @@ button {
 button.principal { background: var(--cerneala); color: var(--hartie); }
 button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
 .stare { font-size: .9rem; color: var(--estompat); min-height: 1.5em; margin: 0; }
+.ajutor { margin: 0; font-size: .95rem; max-width: 40ch; }
+.ajutor b { display: block; font-family: var(--f-litere); font-weight: 700; font-size: 1rem;
+  text-transform: uppercase; letter-spacing: .08em; }
+.ajutor span { font-family: var(--f-litere); font-weight: 600; font-size: 1.15rem; letter-spacing: .06em; }
 
 /* --- Definițiile --- */
 .definitii { display: grid; gap: 20px; min-width: 0; }
@@ -140,6 +144,7 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
         <button id="btnGoleste" type="button">Golește</button>
       </div>
       <p class="stare" id="stare" aria-live="polite"></p>
+      <p class="ajutor" id="ajutor"></p>
     </section>
 
     <section class="definitii">
@@ -426,6 +431,17 @@ document.getElementById("btnGoleste").addEventListener("click", () => {
   stare.textContent = "";
   mergiLa(0, 0);
 });
+
+/* Cuvintele de 3 litere se dau ca ajutor, sub careu (convenție de rebus) */
+(function cuvinteDeTrei() {
+  const gasite = new Set();
+  for (let r = 0; r < N; r++) CAREU[r].split("#").forEach(w => w.length === 3 && gasite.add(w));
+  for (let c = 0; c < N; c++)
+    CAREU.map(rand => rand[c]).join("").split("#").forEach(w => w.length === 3 && gasite.add(w));
+  if (gasite.size)
+    document.getElementById("ajutor").innerHTML =
+      `<b>Cuvinte de 3 litere</b><span>${[...gasite].sort().join(", ")}</span>`;
+})();
 
 /* Butonul de soluție apare abia la 24 de ore după publicare */
 (function programeazaSolutia() {
