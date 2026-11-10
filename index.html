@@ -449,10 +449,10 @@ if (CUVINTE_RARE.length)
   };
   const ramas = momentul - Date.now();
   if (ramas <= 0) return arata();
-  const cand = new Date(momentul).toLocaleString("ro-RO", {
-    weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
-  });
-  stare.textContent = `Soluția se publică ${cand}.`;
+  // „mâine” dacă soluția apare în ziua următoare, „azi” dacă apare chiar în ziua de azi
+  const ziua = d => new Date(d).toDateString();
+  const azi = ziua(Date.now()) === ziua(momentul);
+  stare.textContent = azi ? "Soluția va fi vizibilă azi." : "Soluția va fi vizibilă mâine.";
   stare.dataset.asteptare = "1";
   if (ramas < 2 ** 31) setTimeout(arata, ramas);
 })();
