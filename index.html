@@ -432,16 +432,12 @@ document.getElementById("btnGoleste").addEventListener("click", () => {
   mergiLa(0, 0);
 });
 
-/* „Cuvinte rare”: cuvintele de 3 litere, date ca ajutor sub careu (convenție de rebus) */
-(function cuvinteDeTrei() {
-  const gasite = new Set();
-  for (let r = 0; r < N; r++) CAREU[r].split("#").forEach(w => w.length === 3 && gasite.add(w));
-  for (let c = 0; c < N; c++)
-    CAREU.map(rand => rand[c]).join("").split("#").forEach(w => w.length === 3 && gasite.add(w));
-  if (gasite.size)
-    document.getElementById("ajutor").innerHTML =
-      `<b>Cuvinte rare</b><span>${[...gasite].sort().join(", ")}</span>`;
-})();
+/* „Cuvinte rare”: cuvintele scurte mai puțin cunoscute, date ca ajutor sub careu.
+   Le alegi tu, pentru fiecare careu. */
+const CUVINTE_RARE = ["ABA", "DNA", "MDA"];
+if (CUVINTE_RARE.length)
+  document.getElementById("ajutor").innerHTML =
+    `<b>Cuvinte rare</b><span>${CUVINTE_RARE.join(", ")}</span>`;
 
 /* Butonul de soluție apare abia la 24 de ore după publicare */
 (function programeazaSolutia() {
