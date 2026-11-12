@@ -447,10 +447,13 @@ if (CUVINTE_RARE.length)
   document.getElementById("ajutor").innerHTML =
     `<b>Cuvinte rare</b><span>${CUVINTE_RARE.join(", ")}</span>`;
 
-/* Butonul de soluție apare abia la 24 de ore după publicare */
+/* Butonul „Arată soluția” apare a doua zi după publicare, la ora 00:00 (ora României) */
 (function programeazaSolutia() {
   const btn = document.getElementById("btnSolutie");
-  const momentul = new Date(PUBLICAT).getTime() + 24 * 60 * 60 * 1000;
+  const [dataPublicarii] = PUBLICAT.split("T");          // ex. "2026-11-11"
+  const fus = PUBLICAT.slice(-6);                          // ex. "+02:00"
+  const miezulNoptii = new Date(`${dataPublicarii}T00:00:00${fus}`).getTime();
+  const momentul = miezulNoptii + 24 * 60 * 60 * 1000;    // 00:00 în ziua următoare
   const arata = () => {
     btn.hidden = false;
     if (stare.dataset.asteptare) { stare.textContent = ""; delete stare.dataset.asteptare; }
