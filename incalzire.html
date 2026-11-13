@@ -314,6 +314,7 @@ celule.flat().filter(Boolean).forEach(inp => {
     inp.value = /\p{L}/u.test(litera) ? litera : "";
     inp.classList.remove("bine", "gresit");
     if (inp.value) directie === "orizontal" ? pasCatre(0, 1) : pasCatre(1, 0);
+    if (inp.value && careuComplet()) sarbatoreste();
   });
 
   inp.addEventListener("keydown", e => {
@@ -372,6 +373,11 @@ document.getElementById("btnVerifica").addEventListener("click", () => {
     x.classList.add(ok ? "bine" : "gresit");
     if (ok) bune++;
   }));
+  if (bune === total) {
+    if (solutieAratata) { stare.textContent = "Soluția e afișată."; return; }
+    artificiiFacute = false;   // la „Verifică” artificiile se pot revedea
+    return sarbatoreste();
+  }
   stare.textContent = bune === total
     ? "Dezlegat complet. Bravo!"
     : `${bune} litere bune din ${total}` + (goale ? `, ${goale} căsuțe goale.` : ". Cele roșii sunt greșite.");
@@ -381,14 +387,88 @@ document.getElementById("btnSolutie").addEventListener("click", () => {
   celule.forEach((rand, r) => rand.forEach((x, c) => {
     if (x) { x.value = CAREU[r][c]; x.classList.remove("bine", "gresit"); }
   }));
+  solutieAratata = true;
   stare.textContent = "Soluția e afișată.";
 });
 
 document.getElementById("btnGoleste").addEventListener("click", () => {
   celule.flat().forEach(x => { if (x) { x.value = ""; x.classList.remove("bine", "gresit"); } });
   stare.textContent = "";
+  solutieAratata = false; artificiiFacute = false;
   mergiLa(0, 0);
 });
+
+/* ============================================================
+   7. ARTIFICII la dezlegarea completă (nu și după „Arată soluția”)
+   ============================================================ */
+let solutieAratata = false, artificiiFacute = false;
+
+function careuComplet() {
+  return celule.every((rand, r) => rand.every((x, c) =>
+    !x || (x.value && faraDiacritice(x.value) === CAREU[r][c])));
+}
+
+function sarbatoreste() {
+  if (solutieAratata || artificiiFacute) return;
+  artificiiFacute = true;
+  stare.textContent = "Dezlegat complet. Bravo! 🎉";
+  celule.flat().forEach(x => x && x.classList.add("bine"));
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  artificii();
+}
+
+function artificii() {
+  const cv = document.createElement("canvas");
+  cv.setAttribute("aria-hidden", "true");
+  Object.assign(cv.style, { position: "fixed", inset: "0", width: "100%", height: "100%",
+    pointerEvents: "none", zIndex: "9999" });
+  document.body.appendChild(cv);
+  const ctx = cv.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+  const culori = ["#f5b700", "#e8414f", "#1fa463", "#2f80ed", "#ff7a1a", "#9b51e0", "#e84393"];
+  const rachete = [], scantei = [];
+  const DURATA = 3800, start = performance.now();
+  // 7 rachete lansate pe rând, din locuri diferite
+  for (let i = 0; i < 7; i++) rachete.push({
+    t0: i * 380 + Math.random() * 150,
+    x: W * (0.15 + 0.7 * Math.random()), y: H,
+    tinta: H * (0.18 + 0.3 * Math.random()),
+    vy: -H * 0.022 * (0.9 + Math.random() * 0.25),
+    culoare: culori[i % culori.length], explodat: false, pornit: false });
+  function explodeaza(r) {
+    const n = 90 + Math.floor(Math.random() * 40), v = (3.4 + Math.random() * 2.2) * dpr;
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * Math.PI * 2, s = v * (0.6 + Math.random() * 0.6);
+      scantei.push({ x: r.x, y: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+        viata: 1, scade: 0.012 + Math.random() * 0.01,
+        culoare: Math.random() < 0.2 ? "#f5b700" : r.culoare });
+    }
+  }
+  (function cadru(acum) {
+    const t = acum - start;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "source-over";
+    for (const r of rachete) {
+      if (t < r.t0 || r.explodat) continue;
+      r.y += r.vy;
+      ctx.fillStyle = "#f5b700";
+      ctx.beginPath(); ctx.arc(r.x, r.y, 3 * dpr, 0, 7); ctx.fill();
+      if (r.y <= r.tinta) { r.explodat = true; explodeaza(r); }
+    }
+    for (const s of scantei) {
+      if (s.viata <= 0) continue;
+      s.x += s.vx; s.y += s.vy; s.vy += 0.045 * dpr; s.vx *= 0.985; s.vy *= 0.985;
+      s.viata -= s.scade;
+      ctx.globalAlpha = Math.max(s.viata, 0);
+      ctx.fillStyle = s.culoare;
+      ctx.beginPath(); ctx.arc(s.x, s.y, 2.6 * dpr * (0.5 + s.viata / 2), 0, 7); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    const vii = scantei.some(s => s.viata > 0) || rachete.some(r => !r.explodat);
+    if (t < DURATA || vii) requestAnimationFrame(cadru); else cv.remove();
+  })(start);
+}
 
 /* Pornire: prima căsuță selectată, fără focus (ca să nu apară tastatura pe telefon) */
 mergiLa(0, 0, false);
