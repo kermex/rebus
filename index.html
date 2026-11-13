@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Careu: Mineritul</title>
-<meta name="description" content="Careu tematic 10×10, cu definiții cu șpil. Cine îl dezleagă primul?">
+<title>Careu: Toamna</title>
+<meta name="description" content="Careu de toamnă, 10×10, cu definiții cu șpil. Cine îl dezleagă primul?">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kermex.github.io/rebus/">
-<meta property="og:title" content="Careu: Mineritul">
-<meta property="og:description" content="Careu tematic 10×10, cu definiții cu șpil. Cine îl dezleagă primul?">
+<meta property="og:title" content="Careu: Toamna">
+<meta property="og:description" content="Careu de toamnă, 10×10, cu definiții cu șpil. Cine îl dezleagă primul?">
 <meta property="og:image" content="https://kermex.github.io/rebus/preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -138,8 +138,8 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
 
 <div class="pagina">
   <header>
-    <h1>Mineritul</h1>
-    <p>Careu tematic 10×10, pentru cei din Țara Zarandului și nu numai. Scrie direct în căsuțe. Click pe aceeași căsuță schimbă direcția, iar săgețile te mută prin careu. Diacriticele nu contează, ca la orice rebus.</p>
+    <h1>Toamna</h1>
+    <p>Careu tematic 10×10, cu miros de frunze uscate, pentru serile lungi de toamnă. Scrie direct în căsuțe. Click pe aceeași căsuță schimbă direcția, iar săgețile te mută prin careu. Diacriticele nu contează, ca la orice rebus.</p>
   </header>
 
   <div class="continut">
@@ -178,11 +178,11 @@ button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
 /* Soluția e codată (base64, de-a-ndoaselea), ca să nu se vadă dacă cineva
    se uită în codul paginii. Pentru un careu nou: scrii rândurile cu litere,
    iar Claude îți generează linia codată. "#" = pătrat negru. */
-const SOLUTIE_CODATA = "UlVBVCNJVEVWQVUjUE9DQU5SQVRBU0EjSVJBUCNJI0FTSU4jTVNBQlBQI1pJVkEjQ1JNQUQjTE9DQVJPQSNJQUMjQUJBI0VJQUIjSVpJQ0FUQVJPTk8jQU5EU00jVElSRU5JTQ==";
+const SOLUTIE_CODATA = "Q1JBUCNMRVJVQU8jSUNSRVBVSUNGTEUjQUJJQSNJI0VSRU0jQ0xFTUVDI0FVT04jWkFJQVQjUkVJTklNQSNTSUIjUk9MI09SVUUjSVBMQVRMQU1ST04jQU5BUEkjRU5BVFNBQw==";
 const LATURA = 10;
 
-/* Data și ora publicării. Butonul „Arată soluția” apare după 24 de ore. */
-const PUBLICAT = "2026-11-11T17:15:00+02:00";
+/* Data și ora publicării. Butonul „Arată soluția” apare a doua zi, la ora 00:00. */
+const PUBLICAT = "2026-11-13T13:47:00+02:00";
 
 const CAREU = (() => {
   const s = [...atob(SOLUTIE_CODATA)].reverse().join("");
@@ -194,28 +194,28 @@ const CAREU = (() => {
    de minimum 2 litere, în ordine de la stânga la dreapta / de sus în jos. */
 const DEFINITII = {
   orizontal: {
-    1: ["Meserie care se face cu capul în pământ.", "Manuscris (abr.)."],
-    2: ["Procurori care nu iartă (abr.).", "Cinstit cu un titlu."],
-    3: ["Substanțe care ard fără foc.", "Mină, pe limba moților."],
-    4: ["Postav gros pentru sumane.", "Putere ascunsă sub capotă."],
-    5: ["Prezicătorul de la Delfi.", "Oferim cu toții."],
-    6: ["Arc fără început!", "Aprobare cu ștampilă.", "Pop fără vocală!"],
-    7: ["Poveste cu Făt-Frumos.", "Scobitură în perete, pentru o statuetă."],
-    8: ["Stâlpi de gard.", "Doar ... și nu altfel!"],
-    9: ["Unealta ortacului, cu două ciocuri."],
-    10: ["Posedați.", "Zodie cu coarne."],
+    1: ["Se coc pe jar în serile de toamnă.", "Localitate în județul Sălaj."],
+    2: ["Soția Meșterului Manole.", "Ca de obicei."],
+    3: ["Foșnesc prin frunzele uscate.", "Bancnota Europei."],
+    4: ["Finalul verilor!", "Strigat la final de concert."],
+    5: ["Ca Bradul de altădată.", "Fac felii."],
+    6: ["Început de azur!", "Ca luna la începutul ciclului.", "Întrebare banală."],
+    7: ["Iese după ploaie cu casa în spinare.", "Se culeg din livadă, roșii sau ionatane."],
+    8: ["Să ... noroc!", "Spiriduș din legendele nordice."],
+    9: ["Răsar în pădure după ploile de toamnă."],
+    10: ["Vlaicu, pionierul aviației, din județul nostru.", "Aici frunzele cad pe bănci."],
   },
   vertical: {
-    1: ["Da, dar cu îndoială.", "Drumul Lunii în jurul Pământului."],
-    2: ["Umple vagonetul.", "Avocat (abr.)."],
-    3: ["Dracul, spus mai politicos.", "Către."],
-    4: ["Comoara din adâncuri, pe harta geologului."],
-    5: ["Familie de albine plecată de acasă.", "Început de ovăz!", "Grădina lui Adam."],
-    6: ["Plantă din care se țese pânza.", "Ochi de medic."],
-    7: ["Bate ritmul în fanfara minerilor.", "Opusul nopții.", "Coada robotului!"],
-    8: ["Incursiune rapidă.", "Cu ea se începe și grădina, și galeria."],
-    9: ["Luna florilor.", "Țin degetul pe buton."],
-    10: ["Moara de zdrobit minereul aurifer, în Apuseni.", "Comoara Bradului, expusă la muzeu."],
+    1: ["Etaj.", "Mama, spusă cu drag."],
+    2: ["Le faci la laborator.", "Început de iunie!"],
+    3: ["Cameră de primire.", "Frunză pentru supă și pentru învingători."],
+    4: ["Fiu de rege, spus mai solemn."],
+    5: ["Se adună la fiecare zi de naștere.", "Sfârșit de video!", "Zece decibeli."],
+    6: ["Ardelenescul „ei bine”.", "Noiembrie, pe vremuri."],
+    7: ["Începutul ... noastre.", "Capete de alee!", "Cai putere (abr.)."],
+    8: ["Dulce în teasc, înainte să fie vin.", "O ia de la capăt."],
+    9: ["Din nou.", "... om, nu altul."],
+    10: ["Bate în geam toată toamna.", "Arde în sobă când vine frigul."],
   },
 };
 
@@ -442,7 +442,7 @@ document.getElementById("btnGoleste").addEventListener("click", () => {
 
 /* „Cuvinte rare”: cuvintele scurte mai puțin cunoscute, date ca ajutor sub careu.
    Le alegi tu, pentru fiecare careu. */
-const CUVINTE_RARE = ["ABA", "DNA", "MDA"];
+const CUVINTE_RARE = ["BEL"];
 if (CUVINTE_RARE.length)
   document.getElementById("ajutor").innerHTML =
     `<b>Cuvinte rare</b><span>${CUVINTE_RARE.join(", ")}</span>`;
