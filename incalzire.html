@@ -428,13 +428,13 @@ function artificii() {
   const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
   const culori = ["#f5b700", "#e8414f", "#1fa463", "#2f80ed", "#ff7a1a", "#9b51e0", "#e84393"];
   const rachete = [], scantei = [];
-  const DURATA = 3800, start = performance.now();
+  const DURATA = 4600, start = performance.now();
   // 7 rachete lansate pe rând, din locuri diferite
   for (let i = 0; i < 7; i++) rachete.push({
-    t0: i * 380 + Math.random() * 150,
+    t0: i * 430 + Math.random() * 150,
     x: W * (0.15 + 0.7 * Math.random()), y: H,
     tinta: H * (0.18 + 0.3 * Math.random()),
-    vy: -H * 0.022 * (0.9 + Math.random() * 0.25),
+    vy: -H * 0.0135 * (0.9 + Math.random() * 0.25), urma: [],
     culoare: culori[i % culori.length], explodat: false, pornit: false });
   function explodeaza(r) {
     const n = 90 + Math.floor(Math.random() * 40), v = (3.4 + Math.random() * 2.2) * dpr;
@@ -452,8 +452,29 @@ function artificii() {
     for (const r of rachete) {
       if (t < r.t0 || r.explodat) continue;
       r.y += r.vy;
-      ctx.fillStyle = "#f5b700";
-      ctx.beginPath(); ctx.arc(r.x, r.y, 3 * dpr, 0, 7); ctx.fill();
+      r.x += Math.sin((t - r.t0) / 90) * 0.4 * dpr;   // mică unduire
+      r.urma.push({ x: r.x, y: r.y });
+      if (r.urma.length > 22) r.urma.shift();
+      // coada: dâră aurie care se stinge spre capăt
+      for (let k = 1; k < r.urma.length; k++) {
+        const f = k / r.urma.length;
+        ctx.globalAlpha = 0.25 + f * 0.75;
+        ctx.strokeStyle = k > r.urma.length - 6 ? "#ffc83d" : "#e07b00";
+        ctx.lineWidth = (1.5 + f * 4.5) * dpr;
+        ctx.beginPath(); ctx.moveTo(r.urma[k-1].x, r.urma[k-1].y);
+        ctx.lineTo(r.urma[k].x, r.urma[k].y); ctx.stroke();
+      }
+      // scântei mici care cad din coadă
+      if (Math.random() < 0.6) scantei.push({ x: r.x + (Math.random() - 0.5) * 4 * dpr, y: r.y,
+        vx: (Math.random() - 0.5) * 0.8 * dpr, vy: Math.random() * 1.2 * dpr,
+        viata: 0.6, scade: 0.03, culoare: "#e88a00" });
+      // capul: halou + miez luminos
+      ctx.globalAlpha = 0.5; ctx.fillStyle = r.culoare;
+      ctx.beginPath(); ctx.arc(r.x, r.y, 11 * dpr, 0, 7); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = "#ffe08a";
+      ctx.beginPath(); ctx.arc(r.x, r.y, 5 * dpr, 0, 7); ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath(); ctx.arc(r.x, r.y, 2.2 * dpr, 0, 7); ctx.fill();
       if (r.y <= r.tinta) { r.explodat = true; explodeaza(r); }
     }
     for (const s of scantei) {
