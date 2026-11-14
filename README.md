@@ -6,7 +6,8 @@ Rebusuri tematice, compuse cu drag pentru prieteni, în tradiția cercului rebus
 
 | Nr. | Careu | Mărime | Link |
 |---|---|---|---|
-| 2 | **Toamna** | 10×10 | [Dezleagă online](https://kermex.github.io/rebus/) |
+| 3 | **Informatică** | 10×10 | [Dezleagă online](https://kermex.github.io/rebus/) |
+| 2 | Toamna | 10×10 | [Dezleagă online](https://kermex.github.io/rebus/toamna.html) |
 | 1 | Mineritul | 10×10 | [Dezleagă online](https://kermex.github.io/rebus/minerit.html) |
 | 0 | Careul de încălzire | 5×5 | [Dezleagă online](https://kermex.github.io/rebus/incalzire.html) |
 

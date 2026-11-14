@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Careu: Toamna</title>
+<meta name="description" content="Careu de toamnă, 10×10, cu definiții cu șpil. Cine îl dezleagă primul?">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kermex.github.io/rebus/toamna.html">
+<meta property="og:title" content="Careu: Toamna">
+<meta property="og:description" content="Careu de toamnă, 10×10, cu definiții cu șpil. Cine îl dezleagă primul?">
+<meta property="og:image" content="https://kermex.github.io/rebus/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: careul în stânga ca pagina de revistă, definițiile în dreapta; pe telefon, una sub alta. */
+:root {
+  --hartie: #eef1f3;      /* fundalul paginii */
+  --cerneala: #18222c;    /* text și pătrate negre */
+  --casuta: #ffffff;      /* căsuțele albe */
+  --linie: #9aa6b0;       /* liniile grilei */
+  --marker: #ffe27a;      /* căsuța activă, ca un marker galben */
+  --cuvant: #dfe9f2;      /* restul cuvântului selectat */
+  --bine: #2f7d4f;
+  --gresit: #b23a3a;
+  --estompat: #5b6772;
+
+  --f-litere: "Barlow Condensed", "Arial Narrow", sans-serif-condensed, sans-serif;
+  --f-text: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-cifre: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --hartie: #141a20; --cerneala: #e6ebef; --casuta: #1f272f; --linie: #4a5662;
+    --marker: #8a6d12; --cuvant: #263646; --bine: #5fc58a; --gresit: #ef7a7a; --estompat: #97a3ad;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --hartie: #141a20; --cerneala: #e6ebef; --casuta: #1f272f; --linie: #4a5662;
+  --marker: #8a6d12; --cuvant: #263646; --bine: #5fc58a; --gresit: #ef7a7a; --estompat: #97a3ad;
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body {
+  margin: 0;
+  background: var(--hartie);
+  color: var(--cerneala);
+  font-family: var(--f-text);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 40px;
+}
+.pagina { max-width: 860px; margin: 0 auto; display: grid; gap: 24px; }
+
+header h1 {
+  font-family: var(--f-litere); font-weight: 700; font-size: 2.2rem;
+  letter-spacing: .02em; text-transform: uppercase; margin: 0; line-height: 1.1;
+}
+header p { margin: 4px 0 0; color: var(--estompat); max-width: 60ch; }
+
+.continut { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 820px) { .continut { grid-template-columns: minmax(0, 1fr); } }
+.pagina { max-width: 1000px; }
+.definitii li .sep { color: var(--estompat); margin: 0 4px; }
+
+/* --- Careul --- */
+.careu-zona { display: grid; gap: 14px; justify-items: start; }
+.careu {
+  --n: 5;
+  --latura: clamp(28px, calc((100vw - 64px) / 10.6), 44px);
+  display: grid;
+  grid-template-columns: 24px repeat(var(--n), var(--latura));
+  grid-template-rows: 24px repeat(var(--n), var(--latura));
+}
+.eticheta {
+  font-family: var(--f-cifre); font-size: .8rem; color: var(--estompat);
+  display: grid; place-items: center;
+}
+.casuta, .negru { border: 1px solid var(--linie); margin: 0 -1px -1px 0; }
+.negru { background: var(--cerneala); border-color: var(--linie); }
+.casuta {
+  background: var(--casuta); color: var(--cerneala);
+  font-family: var(--f-litere); font-weight: 600; font-size: calc(var(--latura) * .62);
+  text-align: center; text-transform: uppercase; caret-color: transparent;
+  width: 100%; height: 100%; padding: 0; border-radius: 0; outline: none;
+}
+.casuta.in-cuvant { background: var(--cuvant); }
+.casuta.activa { background: var(--marker); }
+.casuta.bine { color: var(--bine); }
+.casuta.gresit { color: var(--gresit); }
+.casuta:focus-visible { box-shadow: inset 0 0 0 2px var(--cerneala); }
+
+.definitie-curenta {
+  font-size: .95rem; min-height: 3em; max-width: 34ch;
+  border-left: 3px solid var(--marker); padding-left: 10px;
+}
+.definitie-curenta b { font-family: var(--f-cifre); font-weight: 500; font-size: .85rem; }
+
+.butoane { display: flex; flex-wrap: wrap; gap: 8px; }
+button {
+  font-family: var(--f-text); font-size: .95rem; font-weight: 600;
+  background: transparent; color: var(--cerneala);
+  border: 1.5px solid var(--cerneala); border-radius: 6px; padding: 7px 14px; cursor: pointer;
+}
+button.principal { background: var(--cerneala); color: var(--hartie); }
+button:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
+.stare { font-size: .9rem; color: var(--estompat); min-height: 1.5em; margin: 0; }
+.ajutor { margin: 0; font-size: .95rem; max-width: 40ch; }
+.ajutor b { display: block; font-family: var(--f-litere); font-weight: 700; font-size: 1rem;
+  text-transform: uppercase; letter-spacing: .08em; }
+.ajutor span { font-family: var(--f-litere); font-weight: 600; font-size: 1.15rem; letter-spacing: .06em; }
+
+/* --- Definițiile --- */
+.definitii { display: grid; gap: 20px; min-width: 0; }
+.definitii h2 {
+  font-family: var(--f-litere); font-weight: 700; font-size: 1.15rem;
+  text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px;
+}
+.definitii ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.definitii li { cursor: pointer; padding: 3px 6px; margin: 0 -6px; border-radius: 4px; }
+.definitii li b { font-family: var(--f-cifre); font-weight: 500; font-size: .85rem; margin-right: 6px; }
+.definitii li.selectata { background: var(--cuvant); }
+.nota { font-size: .85rem; color: var(--estompat); margin: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .casuta { transition: background-color .12s; }
+}
+</style>
+</head>
+<body>
+
+<div class="pagina">
+  <header>
+    <h1>Toamna</h1>
+    <p>Careu tematic 10×10, cu miros de frunze uscate, pentru serile lungi de toamnă. Scrie direct în căsuțe. Click pe aceeași căsuță schimbă direcția, iar săgețile te mută prin careu. Diacriticele nu contează, ca la orice rebus.</p>
+  </header>
+
+  <div class="continut">
+    <section class="careu-zona" aria-label="Careu">
+      <div class="careu" id="careu"></div>
+      <div class="definitie-curenta" id="defCurenta" aria-live="polite"></div>
+      <div class="butoane">
+        <button class="principal" id="btnVerifica" type="button">Verifică</button>
+        <button id="btnSolutie" type="button" hidden>Arată soluția</button>
+        <button id="btnGoleste" type="button">Golește</button>
+      </div>
+      <p class="stare" id="stare" aria-live="polite"></p>
+      <p class="ajutor" id="ajutor"></p>
+    </section>
+
+    <section class="definitii">
+      <div>
+        <h2>Orizontal</h2>
+        <ol id="listaOrizontal"></ol>
+      </div>
+      <div>
+        <h2>Vertical</h2>
+        <ol id="listaVertical"></ol>
+      </div>
+      <p class="nota">Pe fiecare rând, definițiile sunt în ordine, de la stânga la dreapta (sus în jos la verticale), separate prin liniuță.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. DATELE CAREULUI
+   Fiecare rând e un șir de litere; "#" înseamnă pătrat negru.
+   Pentru un careu nou schimbi doar partea asta.
+   ============================================================ */
+/* Soluția e codată (base64, de-a-ndoaselea), ca să nu se vadă dacă cineva
+   se uită în codul paginii. Pentru un careu nou: scrii rândurile cu litere,
+   iar Claude îți generează linia codată. "#" = pătrat negru. */
+const SOLUTIE_CODATA = "Q1JBUCNMRVJVQU8jSUNSRVBVSUNGTEUjQUJJQSNJI0VSRU0jQ0xFTUVDI0FVT04jWkFJQVQjUkVJTklNQSNTSUIjUk9MI09SVUUjSVBMQVRMQU1ST04jQU5BUEkjRU5BVFNBQw==";
+const LATURA = 10;
+
+/* Data și ora publicării. Butonul „Arată soluția” apare a doua zi, la ora 00:00. */
+const PUBLICAT = "2026-11-13T13:47:00+02:00";
+
+const CAREU = (() => {
+  const s = [...atob(SOLUTIE_CODATA)].reverse().join("");
+  return Array.from({ length: LATURA }, (_, i) => s.slice(i * LATURA, (i + 1) * LATURA));
+})();
+
+/* Definițiile, pe rânduri (orizontal) și coloane (vertical).
+   Fiecare rând are o listă: câte o definiție pentru fiecare cuvânt
+   de minimum 2 litere, în ordine de la stânga la dreapta / de sus în jos. */
+const DEFINITII = {
+  orizontal: {
+    1: ["Se coc pe jar în serile de toamnă.", "Localitate în județul Sălaj."],
+    2: ["Soția Meșterului Manole.", "Ca de obicei."],
+    3: ["Foșnesc prin frunzele uscate.", "Bancnota Europei."],
+    4: ["Finalul verilor!", "Strigat la final de concert."],
+    5: ["Ca Bradul de altădată.", "Fac felii."],
+    6: ["Început de azur!", "Ca luna la începutul ciclului.", "Întrebare banală."],
+    7: ["Iese după ploaie cu casa în spinare.", "Se culeg din livadă, roșii sau ionatane."],
+    8: ["Să ... noroc!", "Spiriduș din legendele nordice."],
+    9: ["Răsar în pădure după ploile de toamnă."],
+    10: ["Vlaicu, pionierul aviației, din județul nostru.", "Aici frunzele cad pe bănci."],
+  },
+  vertical: {
+    1: ["Etaj.", "Mama, spusă cu drag."],
+    2: ["Le faci la laborator.", "Început de iunie!"],
+    3: ["Cameră de primire.", "Frunză pentru supă și pentru învingători."],
+    4: ["Fiu de rege, spus mai solemn."],
+    5: ["Se adună la fiecare zi de naștere.", "Sfârșit de video!", "Zece decibeli."],
+    6: ["Ardelenescul „ei bine”.", "Noiembrie, pe vremuri."],
+    7: ["Începutul ... noastre.", "Capete de alee!", "Cai putere (abr.)."],
+    8: ["Dulce în teasc, înainte să fie vin.", "O ia de la capăt."],
+    9: ["Din nou.", "... om, nu altul."],
+    10: ["Bate în geam toată toamna.", "Arde în sobă când vine frigul."],
+  },
+};
+
+/* ============================================================
+   2. DESENAREA GRILEI
+   ============================================================ */
+const N = CAREU.length;
+const grila = document.getElementById("careu");
+grila.style.setProperty("--n", N);
+const celule = []; // celule[r][c] = <input> sau null pentru pătrat negru
+
+grila.appendChild(document.createElement("span")); // colțul gol din stânga sus
+for (let c = 0; c < N; c++) {
+  const e = document.createElement("span");
+  e.className = "eticheta"; e.textContent = c + 1;
+  grila.appendChild(e);
+}
+for (let r = 0; r < N; r++) {
+  const e = document.createElement("span");
+  e.className = "eticheta"; e.textContent = r + 1;
+  grila.appendChild(e);
+  celule.push([]);
+  for (let c = 0; c < N; c++) {
+    if (CAREU[r][c] === "#") {
+      const negru = document.createElement("div");
+      negru.className = "negru";
+      grila.appendChild(negru);
+      celule[r].push(null);
+    } else {
+      const inp = document.createElement("input");
+      inp.className = "casuta";
+      inp.id = `c-${r}-${c}`;
+      inp.maxLength = 1;
+      inp.autocomplete = "off";
+      inp.setAttribute("autocapitalize", "characters");
+      inp.setAttribute("aria-label", `Rândul ${r + 1}, coloana ${c + 1}`);
+      inp.dataset.r = r; inp.dataset.c = c;
+      grila.appendChild(inp);
+      celule[r].push(inp);
+    }
+  }
+}
+
+/* ============================================================
+   3. NAVIGAREA: căsuța activă și direcția de scris
+   ============================================================ */
+let activ = { r: 0, c: 0 };
+let directie = "orizontal";
+
+// Cuvântul (segmentul fără pătrate negre) care trece prin căsuța (r, c)
+function segment(r, c, dir) {
+  const pas = dir === "orizontal" ? [0, 1] : [1, 0];
+  let [r0, c0] = [r, c];
+  while (true) {
+    const [pr, pc] = [r0 - pas[0], c0 - pas[1]];
+    if (pr < 0 || pc < 0 || !celule[pr][pc]) break;
+    [r0, c0] = [pr, pc];
+  }
+  const lista = [];
+  let [rr, cc] = [r0, c0];
+  while (rr < N && cc < N && celule[rr][cc]) {
+    lista.push([rr, cc]);
+    rr += pas[0]; cc += pas[1];
+  }
+  return lista;
+}
+
+function numarCuvant(r, c, dir) {
+  const s = segment(r, c, dir);
+  if (s.length < 2) return null;
+  return dir === "orizontal" ? s[0][0] + 1 : s[0][1] + 1;
+}
+
+// Toate cuvintele (de minimum 2 litere) de pe un rând sau o coloană, ca liste de căsuțe
+function cuvinteleLiniei(nr, dir) {
+  const rez = [];
+  for (let k = 0; k < N; k++) {
+    const [r, c] = dir === "orizontal" ? [nr - 1, k] : [k, nr - 1];
+    if (!celule[r][c]) continue;
+    const s = segment(r, c, dir);
+    if (s.length >= 2 && s[0][0] === r && s[0][1] === c) rez.push(s);
+  }
+  return rez;
+}
+
+// Al câtelea cuvânt de pe linie e cel care conține căsuța (r, c)
+function indexCuvant(r, c, dir) {
+  const nr = numarCuvant(r, c, dir);
+  if (!nr) return -1;
+  const start = segment(r, c, dir)[0];
+  return cuvinteleLiniei(nr, dir).findIndex(s => s[0][0] === start[0] && s[0][1] === start[1]);
+}
+
+function evidentiaza() {
+  celule.flat().forEach(x => x && x.classList.remove("activa", "in-cuvant"));
+  let s = segment(activ.r, activ.c, directie);
+  if (s.length < 2) { // o literă singură: încercăm cealaltă direcție
+    const alta = directie === "orizontal" ? "vertical" : "orizontal";
+    if (segment(activ.r, activ.c, alta).length >= 2) { directie = alta; s = segment(activ.r, activ.c, directie); }
+  }
+  s.forEach(([r, c]) => celule[r][c].classList.add("in-cuvant"));
+  celule[activ.r][activ.c].classList.add("activa");
+
+  const nr = numarCuvant(activ.r, activ.c, directie);
+  document.querySelectorAll(".definitii li").forEach(li =>
+    li.classList.toggle("selectata", li.dataset.dir === directie && +li.dataset.nr === nr));
+  const idx = indexCuvant(activ.r, activ.c, directie);
+  const def = nr && idx >= 0 ? (DEFINITII[directie][nr] || [])[idx] : null;
+  document.getElementById("defCurenta").innerHTML = def
+    ? `<b>${directie === "orizontal" ? "Orizontal" : "Vertical"} ${nr}.</b> ${def}`
+    : "";
+}
+
+function mergiLa(r, c, focus = true) {
+  if (r < 0 || c < 0 || r >= N || c >= N || !celule[r][c]) return false;
+  activ = { r, c };
+  if (focus) celule[r][c].focus();
+  evidentiaza();
+  return true;
+}
+
+// Următoarea căsuță albă în direcția dată (sare peste pătratele negre)
+function pasCatre(dr, dc) {
+  let [r, c] = [activ.r + dr, activ.c + dc];
+  while (r >= 0 && c >= 0 && r < N && c < N) {
+    if (celule[r][c]) return mergiLa(r, c);
+    r += dr; c += dc;
+  }
+  return false;
+}
+
+/* ============================================================
+   4. TASTATURA
+   ============================================================ */
+celule.flat().filter(Boolean).forEach(inp => {
+  inp.addEventListener("mousedown", e => {
+    const r = +inp.dataset.r, c = +inp.dataset.c;
+    if (r === activ.r && c === activ.c && document.activeElement === inp) {
+      directie = directie === "orizontal" ? "vertical" : "orizontal";
+      e.preventDefault(); evidentiaza();
+    }
+  });
+  inp.addEventListener("focus", () => mergiLa(+inp.dataset.r, +inp.dataset.c, false));
+
+  inp.addEventListener("input", () => {
+    const litera = inp.value.slice(-1).toUpperCase();
+    inp.value = /\p{L}/u.test(litera) ? litera : "";
+    inp.classList.remove("bine", "gresit");
+    if (inp.value) directie === "orizontal" ? pasCatre(0, 1) : pasCatre(1, 0);
+    if (inp.value && careuComplet()) sarbatoreste();
+  });
+
+  inp.addEventListener("keydown", e => {
+    const harta = { ArrowRight: [0, 1], ArrowLeft: [0, -1], ArrowDown: [1, 0], ArrowUp: [-1, 0] };
+    if (harta[e.key]) {
+      e.preventDefault();
+      const [dr, dc] = harta[e.key];
+      const nouaDir = dr === 0 ? "orizontal" : "vertical";
+      if (nouaDir !== directie && segment(activ.r, activ.c, nouaDir).length >= 2) {
+        directie = nouaDir; evidentiaza();
+      } else pasCatre(dr, dc);
+    } else if (e.key === "Backspace" && !inp.value) {
+      e.preventDefault();
+      if (directie === "orizontal" ? pasCatre(0, -1) : pasCatre(-1, 0)) {
+        const x = celule[activ.r][activ.c]; x.value = ""; x.classList.remove("bine", "gresit");
+      }
+    }
+  });
+});
+
+/* ============================================================
+   5. LISTA DE DEFINIȚII (click pe o definiție = sari la cuvânt)
+   ============================================================ */
+for (const dir of ["orizontal", "vertical"]) {
+  const ol = document.getElementById(dir === "orizontal" ? "listaOrizontal" : "listaVertical");
+  Object.entries(DEFINITII[dir]).forEach(([nr, lista]) => {
+    const li = document.createElement("li");
+    li.dataset.dir = dir; li.dataset.nr = nr;
+    li.innerHTML = `<b>${nr}.</b>` + lista.join('<span class="sep">–</span>');
+    li.addEventListener("click", () => {
+      directie = dir;
+      const primul = cuvinteleLiniei(+nr, dir)[0];
+      if (primul) mergiLa(...primul[0]);
+    });
+    ol.appendChild(li);
+  });
+}
+
+/* ============================================================
+   6. VERIFICARE, SOLUȚIE, GOLIRE
+   Diacriticele se ignoră: Ă = Â = A, Î = I, Ș = S, Ț = T.
+   ============================================================ */
+const faraDiacritice = s =>
+  s.normalize("NFD").replace(/\p{M}/gu, "").replace(/[ŞȘ]/g, "S").replace(/[ŢȚ]/g, "T").toUpperCase();
+const stare = document.getElementById("stare");
+
+document.getElementById("btnVerifica").addEventListener("click", () => {
+  let bune = 0, total = 0, goale = 0;
+  celule.forEach((rand, r) => rand.forEach((x, c) => {
+    if (!x) return;
+    total++;
+    x.classList.remove("bine", "gresit");
+    if (!x.value) { goale++; return; }
+    const ok = faraDiacritice(x.value) === CAREU[r][c];
+    x.classList.add(ok ? "bine" : "gresit");
+    if (ok) bune++;
+  }));
+  if (bune === total) {
+    if (solutieAratata) { stare.textContent = "Soluția e afișată."; return; }
+    artificiiFacute = false;   // la „Verifică” artificiile se pot revedea
+    return sarbatoreste();
+  }
+  stare.textContent = bune === total
+    ? "Dezlegat complet. Bravo!"
+    : `${bune} litere bune din ${total}` + (goale ? `, ${goale} căsuțe goale.` : ". Cele roșii sunt greșite.");
+});
+
+document.getElementById("btnSolutie").addEventListener("click", () => {
+  celule.forEach((rand, r) => rand.forEach((x, c) => {
+    if (x) { x.value = CAREU[r][c]; x.classList.remove("bine", "gresit"); }
+  }));
+  solutieAratata = true;
+  stare.textContent = "Soluția e afișată.";
+});
+
+document.getElementById("btnGoleste").addEventListener("click", () => {
+  celule.flat().forEach(x => { if (x) { x.value = ""; x.classList.remove("bine", "gresit"); } });
+  stare.textContent = "";
+  solutieAratata = false; artificiiFacute = false;
+  mergiLa(0, 0);
+});
+
+/* „Cuvinte rare”: cuvintele scurte mai puțin cunoscute, date ca ajutor sub careu.
+   Le alegi tu, pentru fiecare careu. */
+const CUVINTE_RARE = ["BEL"];
+if (CUVINTE_RARE.length)
+  document.getElementById("ajutor").innerHTML =
+    `<b>Cuvinte rare</b><span>${CUVINTE_RARE.join(", ")}</span>`;
+
+/* Butonul „Arată soluția” apare a doua zi după publicare, la ora 00:00 (ora României) */
+(function programeazaSolutia() {
+  const btn = document.getElementById("btnSolutie");
+  const [dataPublicarii] = PUBLICAT.split("T");          // ex. "2026-11-11"
+  const fus = PUBLICAT.slice(-6);                          // ex. "+02:00"
+  const miezulNoptii = new Date(`${dataPublicarii}T00:00:00${fus}`).getTime();
+  const momentul = miezulNoptii + 24 * 60 * 60 * 1000;    // 00:00 în ziua următoare
+  const arata = () => {
+    btn.hidden = false;
+    if (stare.dataset.asteptare) { stare.textContent = ""; delete stare.dataset.asteptare; }
+  };
+  const ramas = momentul - Date.now();
+  if (ramas <= 0) return arata();
+  // „mâine” dacă soluția apare în ziua următoare, „azi” dacă apare chiar în ziua de azi
+  const ziua = d => new Date(d).toDateString();
+  const azi = ziua(Date.now()) === ziua(momentul);
+  stare.textContent = azi ? "Soluția va fi vizibilă azi." : "Soluția va fi vizibilă mâine.";
+  stare.dataset.asteptare = "1";
+  if (ramas < 2 ** 31) setTimeout(arata, ramas);
+})();
+
+/* ============================================================
+   7. ARTIFICII la dezlegarea completă (nu și după „Arată soluția”)
+   ============================================================ */
+let solutieAratata = false, artificiiFacute = false;
+
+function careuComplet() {
+  return celule.every((rand, r) => rand.every((x, c) =>
+    !x || (x.value && faraDiacritice(x.value) === CAREU[r][c])));
+}
+
+function sarbatoreste() {
+  if (solutieAratata || artificiiFacute) return;
+  artificiiFacute = true;
+  stare.textContent = "Dezlegat complet. Bravo! 🎉";
+  celule.flat().forEach(x => x && x.classList.add("bine"));
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  artificii();
+}
+
+function artificii() {
+  const cv = document.createElement("canvas");
+  cv.setAttribute("aria-hidden", "true");
+  Object.assign(cv.style, { position: "fixed", inset: "0", width: "100%", height: "100%",
+    pointerEvents: "none", zIndex: "9999" });
+  document.body.appendChild(cv);
+  const ctx = cv.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+  const culori = ["#f5b700", "#e8414f", "#1fa463", "#2f80ed", "#ff7a1a", "#9b51e0", "#e84393"];
+  const rachete = [], scantei = [];
+  const DURATA = 4600, start = performance.now();
+  // 7 rachete lansate pe rând, din locuri diferite
+  for (let i = 0; i < 7; i++) rachete.push({
+    t0: i * 430 + Math.random() * 150,
+    x: W * (0.15 + 0.7 * Math.random()), y: H,
+    tinta: H * (0.18 + 0.3 * Math.random()),
+    vy: -H * 0.0135 * (0.9 + Math.random() * 0.25), urma: [],
+    culoare: culori[i % culori.length], explodat: false, pornit: false });
+  function explodeaza(r) {
+    const n = 90 + Math.floor(Math.random() * 40), v = (3.4 + Math.random() * 2.2) * dpr;
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * Math.PI * 2, s = v * (0.6 + Math.random() * 0.6);
+      scantei.push({ x: r.x, y: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+        viata: 1, scade: 0.012 + Math.random() * 0.01,
+        culoare: Math.random() < 0.2 ? "#f5b700" : r.culoare });
+    }
+  }
+  (function cadru(acum) {
+    const t = acum - start;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "source-over";
+    for (const r of rachete) {
+      if (t < r.t0 || r.explodat) continue;
+      r.y += r.vy;
+      r.x += Math.sin((t - r.t0) / 90) * 0.4 * dpr;   // mică unduire
+      r.urma.push({ x: r.x, y: r.y });
+      if (r.urma.length > 22) r.urma.shift();
+      // coada: dâră aurie care se stinge spre capăt
+      for (let k = 1; k < r.urma.length; k++) {
+        const f = k / r.urma.length;
+        ctx.globalAlpha = 0.25 + f * 0.75;
+        ctx.strokeStyle = k > r.urma.length - 6 ? "#ffc83d" : "#e07b00";
+        ctx.lineWidth = (1.5 + f * 4.5) * dpr;
+        ctx.beginPath(); ctx.moveTo(r.urma[k-1].x, r.urma[k-1].y);
+        ctx.lineTo(r.urma[k].x, r.urma[k].y); ctx.stroke();
+      }
+      // scântei mici care cad din coadă
+      if (Math.random() < 0.6) scantei.push({ x: r.x + (Math.random() - 0.5) * 4 * dpr, y: r.y,
+        vx: (Math.random() - 0.5) * 0.8 * dpr, vy: Math.random() * 1.2 * dpr,
+        viata: 0.6, scade: 0.03, culoare: "#e88a00" });
+      // capul: halou + miez luminos
+      ctx.globalAlpha = 0.5; ctx.fillStyle = r.culoare;
+      ctx.beginPath(); ctx.arc(r.x, r.y, 11 * dpr, 0, 7); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = "#ffe08a";
+      ctx.beginPath(); ctx.arc(r.x, r.y, 5 * dpr, 0, 7); ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath(); ctx.arc(r.x, r.y, 2.2 * dpr, 0, 7); ctx.fill();
+      if (r.y <= r.tinta) { r.explodat = true; explodeaza(r); }
+    }
+    for (const s of scantei) {
+      if (s.viata <= 0) continue;
+      s.x += s.vx; s.y += s.vy; s.vy += 0.045 * dpr; s.vx *= 0.985; s.vy *= 0.985;
+      s.viata -= s.scade;
+      ctx.globalAlpha = Math.max(s.viata, 0);
+      ctx.fillStyle = s.culoare;
+      ctx.beginPath(); ctx.arc(s.x, s.y, 2.6 * dpr * (0.5 + s.viata / 2), 0, 7); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    const vii = scantei.some(s => s.viata > 0) || rachete.some(r => !r.explodat);
+    if (t < DURATA || vii) requestAnimationFrame(cadru); else cv.remove();
+  })(start);
+}
+
+/* Pornire: prima căsuță selectată, fără focus (ca să nu apară tastatura pe telefon) */
+mergiLa(0, 0, false);
+</script>
+</body>
+</html>
